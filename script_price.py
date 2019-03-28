@@ -1,12 +1,13 @@
-import sys
+#import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import warnings
-import matplotlib.cbook
-from pprint import pprint
+#import warnings
+#import matplotlib.cbook
+#from pprint import pprint
 
 
+'''
 def normaliseMeanStd(X):
     mean = X.mean(axis=0)
     stdev = X.std(axis=0)
@@ -18,9 +19,12 @@ def normaliseMinMax(X):
     minimum = X.max(axis=0)
     X = (X - minimum)/(maximum-minimum)
     return X, minimum, maximum
-
+'''
 def predict(X, theta):
+    print("X : " + str(X))
+    print("theta : " + str(theta))
     return X*theta[1] + theta[0]
+
 
 def fit(X, y, theta, alpha, num_iters):
     m = len(X)
@@ -36,16 +40,32 @@ def cost(X, y, theta):
     cost = (1/(2*m))*(np.sum(error**2))
     return cost
 
+
 def fit_with_cost(X, y, theta, alpha, num_iters):
     m = len(X)  
     C_history = []
     T_history = []
     for _ in range(num_iters):
         error = predict(X, theta) - y
+        print("error : " + str(error))
         theta[0] = theta[0] - (alpha/m) * np.sum(error)
         theta[1] = theta[1] - (alpha/m) * np.dot(error, X)
         T_history.append(theta.copy())
-        #C_history.append(cost(X, y, theta))
+        C_history.append(cost(X, y, theta))
+    return theta, T_history, C_history
+'''
+def fit_with_cost(X, y, theta, alpha, num_iters):
+    m = len(X)  
+    C_history = []
+    T_history = []
+    for _ in range(num_iters):
+        error = predict(X, theta) - y
+        print("error : " + str(error))
+        theta[0] = theta[0] - (alpha/m) * np.sum(error)
+        theta[1] = theta[1] - (alpha/m) * np.dot(error, X)
+        t = theta.copy()
+        T_history.append(t)
+        C_history.append(cost(X, y, theta))
     return theta, T_history, C_history
 
 def visualizeRegression(X, y, theta):
@@ -64,7 +84,25 @@ def visualizeRegression(X, y, theta):
     ax.set_xlabel('price', fontsize=14, fontweight='bold')
     #plt.show()
     #ax.imshow()
-    
+'''
+def visualizeRegression(X, y, theta):
+    print("regression X: " + str(X))
+    print("regression y: " + str(y))
+    print("regression theta :" + str(theta))
+    plt.figure(1)
+    ax = plt.axes()
+    ax.set_xlim([0,200000])
+    ax.set_ylim([0,10000])
+    ax.scatter(X, y)
+    line_x = np.linspace(0,200000, 200000)
+    line_y = theta[0] + line_x * theta[1]
+    ax.plot(line_x, line_y)
+    plt.title('Function de regression', fontsize=18, fontweight='bold')
+    plt.xlabel('km', fontsize=14, fontweight='bold')
+    plt.ylabel('price', fontsize=14, fontweight='bold')
+    ax.grid(color='black', linestyle='-', linewidth=0.2)
+    plt.show()
+
 def visualizeCost (J_history) :
     plt.figure(2)
     #ax = plt.axes()
@@ -74,7 +112,25 @@ def visualizeCost (J_history) :
     ax.set_ylabel('Cout', fontsize=14, fontweight='bold')
     ax.plot(J_history)
     #plt.show()
-
+'''
+def visualizeCost (C_history) :
+    plt.figure(2)
+    ax = plt.axes()
+    plt.title('Cost evolution', fontsize=18, fontweight='bold')
+    plt.xlabel('Iteration', fontsize=14, fontweight='bold')
+    plt.ylabel('Cout', fontsize=14, fontweight='bold')
+    ax.plot(C_history)
+    plt.show()
+ '''   
+def visualizeTheta (T_history) :
+    plt.figure(3)
+    ax = plt.axes()
+    plt.title('Theta evolution', fontsize=18, fontweight='bold')
+    plt.xlabel('Iteration', fontsize=14, fontweight='bold')
+    plt.ylabel('Theta', fontsize=14, fontweight='bold')
+    ax.plot(T_history)
+    #plt.show()
+'''  
 def visualizeTheta (T_history) :
     plt.figure(3)
     ax = plt.axes()
@@ -83,7 +139,7 @@ def visualizeTheta (T_history) :
     plt.ylabel('Theta', fontsize=14, fontweight='bold')
     ax.plot(T_history)
     plt.show()
-    
+
 def main(argv):    
     data = pd.read_csv(argv)
     #data.plot.scatter('km', 'price')
@@ -116,9 +172,31 @@ def main(argv):
     visualizeRegression(X, y, theta)
     visualizeCost(J_history)
     
-    print("Prediction pour 60000: " + str(predict(240000, theta)))
+    print("Prediction pour 240000: " + str(predict(240000, theta)))
     plt.show()
-
+'''
+def main(argv):  
+    data = pd.read_csv(argv)
+    data.plot.scatter('km', 'price')
+    X = np.array(data['km'])
+    y = np.array(data['price'])
+    
+    theta = np.zeros(2)
+    print("main theta : " + str(theta))
+    Z = X*theta[1] + theta[0]
+    print("main Z : " + str(Z))
+    theta = np.zeros(2)
+    #theta = fit(X, y, theta, 0.02, 1000)
+    theta, T_history, J_history = fit_with_cost(X, y, theta, 0.02, 10)
+    print("theta 0 : " + str(theta[0]))
+    print("theta 1 : " + str(theta[1]))
+    
+    visualizeRegression(X, y, theta)
+    visualizeCost(J_history)
+    visualizeTheta (T_history) 
+    print("Prediction pour 240000: " + str(predict(240000, theta)))
+    #plt.show()
+    
 if __name__ == '__main__':
     #main(sys.argv[1])
     main("data.csv")

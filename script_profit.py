@@ -25,6 +25,7 @@ def fit_with_cost(X, y, theta, alpha, num_iters):
     T_history = []
     for _ in range(num_iters):
         error = predict(X, theta) - y
+        print("error : " + str(error))
         theta[0] = theta[0] - (alpha/m) * np.sum(error)
         theta[1] = theta[1] - (alpha/m) * np.dot(error, X)
         t = theta.copy()
@@ -72,11 +73,13 @@ def main(argv):
     y = np.array(data['profit'])
     
     theta = np.zeros(2)
-    z = X*theta[1] + theta[0]
-
+    print("main theta : " + str(theta))
+    Z = X*theta[1] + theta[0]
+    print("main Z : " + str(Z))
     theta = np.zeros(2)
+    print("main theta : " + str(theta))
     #theta = fit(X, y, theta, 0.02, 1000)
-    theta, T_history, J_history = fit_with_cost(X, y, theta, 0.01, 500)
+    theta, T_history, J_history = fit_with_cost(X, y, theta, 0.02, 10)
     print(theta)
     visualizeRegression(X, y, theta)
     visualizeCost(J_history)
