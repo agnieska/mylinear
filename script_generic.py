@@ -3,15 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statistics
 
-
+'''
 filename = "profit_data1.csv"
 indep = 'population'
 dep = "profit"
 '''
 filename = "price_data.csv"
-indep = "km"
-dep = "price"
-'''
+name_X = "km"
+name_Y = "price"
+
 def hipothesis(X, theta):
     return X*theta[1] + theta[0]
 
@@ -20,8 +20,8 @@ def fit(X, y, theta, alpha, num_iters):
     #m = X.shape[0]
     print("m = " , m)
     print("alpha = " , alpha)
-    gradient = [0,0]
-    X0 = np.ones(len(X))
+    #gradient = [0,0]
+    #X0 = np.ones(len(X))
     for _ in range(num_iters):
         errors = hipothesis(X, theta) - y
         print("errors : " , errors)
@@ -40,13 +40,13 @@ def fit(X, y, theta, alpha, num_iters):
     return theta
 
 def centrer_reduire (X):
-    d = statistics.stdev(X)
-    m = statistics.mean(X)
+    stdev = statistics.stdev(X)
+    mean = statistics.mean(X)
     A = []
     for x in X :
-        a = float((x - m) / d)
+        a = float((x - mean)/stdev)
         A.append(a)
-    return np.array(A), d, m
+    return np.array(A), stdev, mean
 
 
 def calcul_cost(errors, m):
@@ -59,7 +59,7 @@ def fit_with_cost(X, y, theta, alpha, num_iters):
     T_history = []
     for _ in range(num_iters):
         errors = hipothesis(X, theta) - y
-        print("errors : " + str(errors))
+        #print("errors : " + str(errors))
         theta[0] = theta[0] - (alpha * np.sum(errors))/m
         theta[1] = theta[1] - (alpha * np.dot(errors, X))/m
         t = theta.copy()
@@ -70,13 +70,13 @@ def fit_with_cost(X, y, theta, alpha, num_iters):
 
 def visualizeRegression(X, y, theta):
     print("minX : " , min(X))
-    print("max X : " ,max(X))
+    print("max X : " , max(X))
     print("min y : " , min(y))
     print("max y : " , max(y))
     print("theta : " , theta)
     plt.figure(1)
     ax = plt.axes()
-    ax.set_xlim([0 ,max(X)* 2])
+    ax.set_xlim([0 ,max(X)*1.1])
     ax.set_ylim([min(y)*0.9,max(y)*1.1])
     ax.scatter(X, y)
     line_x = np.linspace(0,max(X)*1.1, 20)
@@ -108,9 +108,10 @@ def visualizeTheta (T_history) :
     ax.plot(T_history)
     plt.show()
 
-def predict (x, m, d, theta):
-    x = (x-m)/d
+def predict (x, mean, stdev, theta):
+    x = (x-mean)/stdev
     y = hipothesis(x, theta)
+    if y < 0 : y = 0
     return y
 
     
@@ -118,12 +119,12 @@ def main(argv):
     data = pd.read_csv(argv, sep=",")
 #    print(type(data[indep][0]))
     #data.plot.scatter(indep, dep)
-    RawX = np.array(data[indep].astype(float))
-    y = np.array(data[dep].astype(float))
-    print("X = ", RawX)
+    X_raw = np.array(data[name_X].astype(float))
+    y = np.array(data[name_Y].astype(float))
+    print("X raw = ", X_raw)
     print("y = ", y)
-    X, m, d = centrer_reduire(RawX)
-    print("X = ", X)
+    X_norm, mean, stdev = centrer_reduire(X_raw)
+    print("X normalized = ", X_norm)
     #X = (500000 - X)/1000
     #print("X reversed = ", X)
     theta = np.zeros(2)
@@ -134,12 +135,16 @@ def main(argv):
 #    print("main theta : " + str(theta))
     #theta = fit(X, y, theta, 0.02, 1000)
     print("theta apres le fit" , theta)
-    theta, T_history, J_history = fit_with_cost(X, y, theta, 0.02, 1000)
-    visualizeRegression(X, y, theta)
+    theta, T_history, J_history = fit_with_cost(X_norm, y, theta, 0.2, 100)
+    visualizeRegression(X_norm, y, theta)
     visualizeCost(J_history)
     visualizeTheta (T_history) 
     #print("Prediction pour 5734: "+str(predict(5734, theta)))
-    print("Prediction pour 5734: "+str(predict(5734,m,d, theta)))
+    x = X_raw[2] 
+    print("predic for" , x)
+    x = 54370
+    prediction = round(predict(x, mean , stdev , theta),2)
+    print("Estimated", name_Y,  "for", x, name_X ," = ", prediction , "units")
 
 if __name__ == '__main__':
     #main(sys.argv[1])
