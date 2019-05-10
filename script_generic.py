@@ -108,8 +108,10 @@ def visualizeTheta (T_history) :
     ax.plot(T_history)
     plt.show()
 
-def predict(x, theta):
-    return x*theta[1] + theta[0]
+def predict (x, m, d, theta):
+    x = (x-m)/d
+    y = hipothesis(x, theta)
+    return y
 
     
 def main(argv):  
@@ -136,8 +138,8 @@ def main(argv):
     visualizeRegression(X, y, theta)
     visualizeCost(J_history)
     visualizeTheta (T_history) 
-    print("Prediction pour 5734: "+str(predict(5734, theta)))
-    
+    #print("Prediction pour 5734: "+str(predict(5734, theta)))
+    print("Prediction pour 5734: "+str(predict(5734,m,d, theta)))
 
 if __name__ == '__main__':
     #main(sys.argv[1])
