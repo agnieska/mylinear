@@ -39,7 +39,14 @@ def fit(X, y, theta, alpha, num_iters):
         print("theta iter :" , theta)
     return theta
 
-
+def centrer_reduire (X):
+    d = statistics.stdev(X)
+    m = statistics.mean(X)
+    A = []
+    for x in X :
+        a = float((x - m) / d)
+        A.append(a)
+    return np.array(A), d, m
 
 
 def calcul_cost(errors, m):
@@ -109,11 +116,12 @@ def main(argv):
     data = pd.read_csv(argv, sep=",")
 #    print(type(data[indep][0]))
     #data.plot.scatter(indep, dep)
-    
     RawX = np.array(data[indep].astype(float))
     y = np.array(data[dep].astype(float))
     print("X = ", RawX)
     print("y = ", y)
+    X, m, d = centrer_reduire(RawX)
+    print("X = ", X)
     #X = (500000 - X)/1000
     #print("X reversed = ", X)
     theta = np.zeros(2)
