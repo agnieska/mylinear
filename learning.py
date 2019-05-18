@@ -112,7 +112,12 @@ def predict (x, mean, stdev, theta):
     if y < 0 : y = 0
     return y
 '''
-    
+def save_parameters (theta, mean, stdev) :
+    line = str(theta[0])+","+ str(theta[1]) + "," + str(mean)+","+ str(stdev)
+    with open ("parameters.txt", "w" , encoding="utf-8") as file :
+        file.write(line)
+    file.close
+
 def main(argv):  
     data = pd.read_csv(argv, sep=",")
 #    print(type(data[indep][0]))
@@ -131,18 +136,20 @@ def main(argv):
 #    print("main first occurence de Z : " + str(Z))
 #    theta = [0, 0]
 #    print("main theta : " + str(theta))
-    #theta = fit(X, y, theta, 0.02, 1000)
+    theta = fit(X_norm, y, theta, 0.2, 100)
     print("theta apres le fit" , theta)
-    theta, T_history, J_history = fit_with_cost(X_norm, y, theta, 0.2, 100)
+    #theta, T_history, J_history = fit_with_cost(X_norm, y, theta, 0.2, 100)
     visualizeRegression(X_norm, y, theta)
-    visualizeCost(J_history)
-    visualizeTheta (T_history) 
+    #visualizeCost(J_history)
+    #visualizeTheta (T_history) 
     #print("Prediction pour 5734: "+str(predict(5734, theta)))
-    x = X_raw[2] 
-    print("predic for" , x)
-    x = 54370
-    prediction = round(predict(x, mean , stdev , theta),2)
-    print("Estimated", name_Y,  "for", x, name_X ," = ", prediction , "units")
+    #x = X_raw[2] 
+    #print("predic for" , x)
+    #x = 54370
+    #prediction = round(predict(x, mean , stdev , theta),2)
+    #print("Estimated", name_Y,  "for", x, name_X ," = ", prediction , "units")
+    #saving results
+    save_parameters (theta, mean, stdev)
 
 if __name__ == '__main__':
     #main(sys.argv[1])
