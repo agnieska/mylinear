@@ -7,6 +7,7 @@ def predict (x, mean, stdev, theta):
     y = x * theta[1] + theta[0]
     if y < 0 : y = 0
     return y
+
 def read_file (theta_filename) :
     theta = [0,0]
     mean = 0
@@ -20,7 +21,7 @@ def read_file (theta_filename) :
             #print(line)
     except :
         print ("training results not found. they will be initialized as zero")
-        return theta, mean, stdev
+        return theta, mean, stdev, mean_error
     try :
         parameters = line.split(",")
         print(str(parameters))
@@ -40,12 +41,21 @@ def read_file (theta_filename) :
 
 
 def main (theta_filename) :
+    print("\n-------------------------------------------------------------------")
+    print("READ LEARNING PARAMETERS\n")
     theta, mean, stdev, mean_error = read_file(theta_filename)
-    kilometrage = float(input ("Quel kilometrage ?\n").strip(" "))
+    print ("theta =", theta, "error =", mean_error)
+
+    print("\n-------------------------------------------------------------------")
+    print("PREDICTION")
+    kilometrage = input ("\nQuel kilometrage ?\n").strip(" ")
     while kilometrage not in ["q", "quit", "\n"]:
-        prediction = round(predict (float(kilometrage), mean, stdev, theta), 2)
-        print ("Prediction prix :" , prediction, " euro")
-        print ("Erreur moyenne de prediction :" , round(mean_error,0), " euro")
+        try :
+            prediction = round(predict (float(kilometrage), mean, stdev, theta), 2)
+            print ("Prediction prix :" , prediction, " euro")
+            print ("Erreur moyenne de prediction :" , round(mean_error,0), " euro")
+        except :
+            print("Wrong format of input. Try again")
         kilometrage = input("Autre kilometrage ?\n").strip(" ")
 
 
