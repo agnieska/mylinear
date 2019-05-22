@@ -55,7 +55,7 @@ def fit(X, y, theta, alpha, num_iters):
     return theta, E_history, G_history, T_history 
 
 
-def visualizeData(X, y, theta, name_X, name_Y):  
+def visualizeData(X, y, name_X, name_Y):  
     plt.figure(1)
     ax = plt.axes()
     ax.set_xlim([0 ,max(X)*1.1])
@@ -128,40 +128,48 @@ def save_parameters (theta, mean, stdev, mean_error) :
         file.write(line)
     file.close
 
-def main(argv):  
+def main(argv):
+    # lecture des donnees
     data = pd.read_csv(filename, sep=",")
-    name_X = "km"
-    name_Y = "price"
     columns = list(data.columns.values)
-    print(columns)
     name_X = columns[0]
     name_Y = columns[1]
-    print(name_X, name_Y)
-    
-    print("Bonus : visualisation  des donnees ")
-    data.plot.scatter(name_X, name_Y)
-    
     X_raw = np.array(data[name_X].astype(float))
     y = np.array(data[name_Y].astype(float))
-    print("X raw = ", X_raw)
-    print("y = ", y)
+    
+    print("Phase 1  Lecture des donnees pour apprentissage")
+    print("Found data 'X' to learn : ", name_X , X_raw)
+    print("Found data 'y' to predict : ", name_Y, y)
+    
+    print("Bonus : visualisation  des données brut avant la normalisation")
+    #data.plot.scatter(name_X, name_Y)
+    visualizeData(X_raw, y, name_X, name_Y)
+    
+    print("Phase 2 Normalisation des donnees")
     X_norm, mean, stdev = centrer_reduire(X_raw)
     print("X normalized = ", X_norm)
+    
+    
+    print("Phase 3 Apprentissage")
     theta = np.zeros(2)
+    alpha = 0.2
+    iterations = 100
+    print("Coefficients  avant apprentissage" , theta)
+    print("Try to learn with alpha = ", alpha,"nombre d'iterations =", iterations )
     #theta = fit(X_norm, y, theta, 0.2, 100)
-    theta, E_history, G_history, T_history = fit(X_norm, y, theta, 0.2, 100)
-    print("theta apres le fit" , theta)
+    theta, E_history, G_history, T_history = fit(X_norm, y, theta, alpha, iterations)
+    print("Coefficients apres apprentissage" , theta)
     
     print("bonus : visualise regression" )
     visualizeRegression(X_norm, y, theta, name_X, name_Y)
     
-    print("bonus : visualise gradient descend" )
-    visualizeGradient (G_history) 
-    
-    print("bonus : visualise theta iterations" )
+    print("bonus : visualise coeficients iterations" )
     visualizeTheta (T_history) 
     
-    print("bonus : visualise mean error iterations" )
+    print("bonus : visualise gradient descend " )
+    visualizeGradient (G_history) 
+
+    print("bonus : visualise mean error iterations " )
     visualizeError(E_history)
     #visualizeHistory(E_history, "Mean Error", 3)
     mean_error = E_history.pop()
