@@ -16,9 +16,9 @@ def centrer_reduire (X):
 def hipothesis(X, theta):
     return X*theta[1] + theta[0]
 
-def calcul_cost(errors, m):
-    cost = (1/(2*m))*(np.sum(errors**2))
-    return cost
+def calcul_mean_error(errors, m):
+    mean_error = (1/(2*m))*(np.sum(errors**2))
+    return mean_error
 
 def fit(X, y, theta, alpha, num_iters):
     
@@ -27,7 +27,7 @@ def fit(X, y, theta, alpha, num_iters):
     X0 = np.ones(len(X))
     m = len(X)   #m = X.shape[0]
     gradient = [0,0]
-    C_history = []
+    E_history = []
     G_history = []
     T_history = []
     for _ in range(num_iters):
@@ -36,7 +36,7 @@ def fit(X, y, theta, alpha, num_iters):
         errors = hipothesis(X, theta) - y
         
         # calcul total cost (sum of errors)
-        total_cost = calcul_cost(errors, m)
+        mean_error = calcul_mean_error(errors, m)
 
         #calcul gradient descent avec pas d'apprentissage alpha    
         gradient[0] = alpha * np.dot(errors, X0)/ m
@@ -47,12 +47,12 @@ def fit(X, y, theta, alpha, num_iters):
         theta[1] = theta[1] - gradient[1]
 
         # memorise this iteration
-        C_history.append(total_cost)
+        E_history.append(mean_error)
         gradient_copy = gradient.copy()
         G_history.append(gradient_copy)
         theta_copy = theta.copy()
         T_history.append(theta_copy)
-    return theta, C_history, G_history, T_history 
+    return theta, E_history, G_history, T_history 
 
 
 def visualizeData(X, y, theta, name_X, name_Y):  
@@ -95,13 +95,13 @@ def visualizeHistory (history_list, history_name, figure_number) :
     ax.plot(history_list)
     plt.show()
 '''
-def visualizeCost (C_history) :
+def visualizeError (E_history) :
     plt.figure(4)
     ax = plt.axes()
-    plt.title('Bonus : Cost evolution', fontsize=18, fontweight='bold')
+    plt.title('Bonus : Mean error evolution', fontsize=18, fontweight='bold')
     plt.xlabel('Iteration', fontsize=14, fontweight='bold')
-    plt.ylabel('Cost', fontsize=14, fontweight='bold')
-    ax.plot(C_history)
+    plt.ylabel('Error', fontsize=14, fontweight='bold')
+    ax.plot(E_history)
     plt.show()
 
 def visualizeGradient (G_history) :
@@ -122,8 +122,8 @@ def visualizeTheta (T_history) :
     ax.plot(T_history)
     plt.show()
 
-def save_parameters (theta, mean, stdev) :
-    line = str(theta[0])+","+ str(theta[1]) + "," + str(mean)+","+ str(stdev)
+def save_parameters (theta, mean, stdev, mean_error) :
+    line = str(theta[0])+","+ str(theta[1]) + "," + str(mean)+","+ str(stdev)+","+ str(mean_error)
     with open ("parameters.txt", "w" , encoding="utf-8") as file :
         file.write(line)
     file.close
@@ -149,15 +149,11 @@ def main(argv):
     print("X normalized = ", X_norm)
     theta = np.zeros(2)
     #theta = fit(X_norm, y, theta, 0.2, 100)
-    theta, C_history, G_history, T_history = fit(X_norm, y, theta, 0.2, 100)
+    theta, E_history, G_history, T_history = fit(X_norm, y, theta, 0.2, 100)
     print("theta apres le fit" , theta)
     
     print("bonus : visualise regression" )
     visualizeRegression(X_norm, y, theta, name_X, name_Y)
-    
-    print("bonus : visualise total cost iterations" )
-    visualizeCost(C_history)
-    #visualizeHistory(C_history, "Cost", 3)
     
     print("bonus : visualise gradient descend" )
     visualizeGradient (G_history) 
@@ -165,8 +161,12 @@ def main(argv):
     print("bonus : visualise theta iterations" )
     visualizeTheta (T_history) 
     
+    print("bonus : visualise mean error iterations" )
+    visualizeError(E_history)
+    #visualizeHistory(E_history, "Mean Error", 3)
+    mean_error = E_history.pop()
     #saving results
-    save_parameters (theta, mean, stdev)
+    save_parameters (theta, mean, stdev, mean_error)
     print("parameters saved")
 
 if __name__ == '__main__':
