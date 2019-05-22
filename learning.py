@@ -85,7 +85,7 @@ def visualizeRegression(X, y, theta, name_X, name_Y):
     plt.ylabel(name_Y, fontsize=14, fontweight='bold')
     ax.grid(color='black', linestyle='-', linewidth=0.9)
     plt.show()
-'''    
+    
 def visualizeHistory (history_list, history_name, figure_number) :
     plt.figure(figure_number)
     ax = plt.axes()
@@ -94,7 +94,7 @@ def visualizeHistory (history_list, history_name, figure_number) :
     plt.ylabel(history_name, fontsize=14, fontweight='bold')
     ax.plot(history_list)
     plt.show()
-'''
+
 def visualizeError (E_history) :
     plt.figure(4)
     ax = plt.axes()
@@ -137,45 +137,46 @@ def main(argv):
     X_raw = np.array(data[name_X].astype(float))
     y = np.array(data[name_Y].astype(float))
     
-    print("Phase 1  Lecture des donnees pour apprentissage")
+    print("Phase I  Lecture des donnees pour apprentissage")
     print("Found data 'X' to learn : ", name_X , X_raw)
     print("Found data 'y' to predict : ", name_Y, y)
     
-    print("Bonus : visualisation  des données brut avant la normalisation")
+    print("Bonus 1 : visualisation  des données bruts avant la normalisation")
     #data.plot.scatter(name_X, name_Y)
     visualizeData(X_raw, y, name_X, name_Y)
     
-    print("Phase 2 Normalisation des donnees")
+    print("Phase II Normalisation des donnees")
     X_norm, mean, stdev = centrer_reduire(X_raw)
     print("X normalized = ", X_norm)
     
     
-    print("Phase 3 Apprentissage")
+    print("Phase III Apprentissage")
     theta = np.zeros(2)
     alpha = 0.2
     iterations = 100
     print("Coefficients  avant apprentissage" , theta)
-    print("Try to learn with alpha = ", alpha,"nombre d'iterations =", iterations )
+    print("Try to learn with alpha = ", alpha," nombre d'iterations =", iterations )
     #theta = fit(X_norm, y, theta, 0.2, 100)
     theta, E_history, G_history, T_history = fit(X_norm, y, theta, alpha, iterations)
+    print(E_history)
+    mean_error = E_history[-1]
     print("Coefficients apres apprentissage" , theta)
+    print("Bonus 2 : Erreur d'apprentissage : ", mean_error)
     
-    print("bonus : visualise regression" )
+    # Learnig visualisations
+    print("Bonus 3 : visualise regression" )
     visualizeRegression(X_norm, y, theta, name_X, name_Y)
+    print("Bonus 4 : visualise all iterations of coeficients search" )
+    visualizeHistory(T_history, "Coeficients Theta", 3)
+    print("Bonus 5 : visualise all iterations of gradient descend " )
+    visualizeHistory(G_history, "Gradient", 4)
+    print("Bonus 6 : visualise all iterations of mean error" )
+    visualizeHistory(E_history, "Mean Error", 5)
     
-    print("bonus : visualise coeficients iterations" )
-    visualizeTheta (T_history) 
-    
-    print("bonus : visualise gradient descend " )
-    visualizeGradient (G_history) 
-
-    print("bonus : visualise mean error iterations " )
-    visualizeError(E_history)
-    #visualizeHistory(E_history, "Mean Error", 3)
-    mean_error = E_history.pop()
     #saving results
+    print("Phase IV : Saving parameters ")
     save_parameters (theta, mean, stdev, mean_error)
-    print("parameters saved")
+    print("parameters saved to file parameters.txt")
 
 if __name__ == '__main__':
     filename = "price_data.csv"
