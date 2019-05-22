@@ -49,7 +49,7 @@ def main (theta_filename) :
     print("\n-------------------------------------------------------------------")
     print("PREDICTION")
     kilometrage = input ("\nQuel kilometrage ?\n").strip(" ")
-    while kilometrage not in ["q", "quit", "\n"]:
+    while kilometrage not in ["q", "quit", ""]:
         try :
             prediction = round(predict (float(kilometrage), mean, stdev, theta), 2)
             print ("Prediction prix :" , prediction, " euro")
