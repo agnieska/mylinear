@@ -1,7 +1,6 @@
 import numpy as np
+import sys
 
-
-theta_filename = "parameters.txt"
 
 def predict (x, mean, stdev, theta):
     x = (x-mean)/stdev
@@ -12,7 +11,7 @@ def read_file (theta_filename) :
     theta = [0,0]
     mean = 0
     stdev = 0.00001
-    #mean_error = 0
+    mean_error = 0
     parameters = []
     try : 
         with open (theta_filename, "r", encoding="utf-8") as file :
@@ -33,22 +32,27 @@ def read_file (theta_filename) :
         theta[1] = float(parameters[1].strip(" "))
         mean = float(parameters[2].strip(" "))
         stdev = float(parameters[3].strip(" "))
-        #mean_error =  float(parameters[4].strip(" "))
+        mean_error =  float(parameters[4].strip(" "))
     except :
         print ("wrong numbers of parameters in first line. Expected 4")
-        return theta, mean, stdev #, mean_error
-    return theta, mean, stdev #, mean_error
+        return theta, mean, stdev , mean_error
+    return theta, mean, stdev , mean_error
 
 
 def main (theta_filename) :
-    theta, mean, stdev = read_file(theta_filename)
+    theta, mean, stdev, mean_error = read_file(theta_filename)
     kilometrage = float(input ("Quel kilometrage ?\n").strip(" "))
     while kilometrage not in ["q", "quit", "\n"]:
-        prediction = round(predict (kilometrage, mean, stdev, theta), 2)
+        prediction = round(predict (float(kilometrage), mean, stdev, theta), 2)
         print ("Prediction prix :" , prediction, " euro")
-        kilometrage = float(input("Autre kilometrage ?\n").strip(" "))
+        print ("Erreur moyenne de prediction :" , round(mean_error,0), " euro")
+        kilometrage = input("Autre kilometrage ?\n").strip(" ")
 
 
-if __name__ == '__main__':
-    #main(sys.argv[1])
+if __name__ == '__main__': 
+    theta_filename = "parameters.txt"
+    if len(sys.argv) == 2 :
+        theta_filename = sys.argv[1]
+    elif len(sys.argv) > 2 :
+        sys.exit("Wrong number of parameters. expected one data file or nothing")
     main(theta_filename)
