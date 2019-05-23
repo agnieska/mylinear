@@ -29,47 +29,56 @@ def centrer_reduire (X):
         A.append(a)
     return np.array(A), stdev, mean
 
-def hipothesis(X, theta):
-    return X*theta[1] + theta[0]
+def calcul_cost(loss_vector):
+    sample_size = len(loss_vector)
+    sum_loss_square = sum(loss_vector ** 2)
+    double_size = 2 * sample_size
+    cost = sum_loss_square / double_size
+    return cost
 
-def calcul_cost(errors, m):
-    mean_error = np.sum((errors**2)**0.5)/m
-    total_cost = (1/(2*m))*(np.sum(errors**2))
-    return mean_error, total_cost
+def calcul_error(loss_vector):
+    sample_size = len(loss_vector)
+    loss_absolute = (loss_vector **2) **0.5
+    max_error = max(loss_absolute)
+    mean_error = sum(loss_absolute) / sample_size
+    return mean_error, max_error
 
 def learn(X, y, theta, alpha, num_iters):    
-    X0 = np.ones(len(X))
-    m = len(X)   #m = X.shape[0]
-    gradient = [0,0]
+    X0 = X ** 0
+    X1 = X ** 1
+    sample_size = len(X)   #sample_size = X.shape[0]
     E_history = []
     C_history = []
     G_history = []
     T_history = []
     for _ in range(num_iters):
-        # calcul error between hipothesis and real data (Y)
-        errors = hipothesis(X, theta) - y
-        # calcul total cost (sum of errors) for gradient and mean error for prediction
-        mean_error, total_cost = calcul_cost(errors, m)
+        # calcul delta (ecart) between hipothesis and real empirical data (Y)
+        estimated_results = theta[0] * X0  +  theta[1] * X1
+        empirical_results = y
+        loss_vector = estimated_results - empirical_results
         #calcul gradient descent avec pas d'apprentissage alpha    
-        gradient[0] = alpha * np.dot(errors, X0)/ m
-        gradient[1] = alpha * np.dot(errors, X)/ m
+        gradient_X0 =  - alpha / sample_size * sum(loss_vector * X0)
+        gradient_X1 =  - alpha / sample_size * sum(loss_vector * X1)
+        #calcul new coefficients
+        theta_X0 = theta[0] + gradient_X0 
+        theta_X1 = theta[1] + gradient_X1
         #update theta 0 et theta 1
-        theta[0] = theta[0] - gradient[0] 
-        theta[1] = theta[1] - gradient[1]
-        # memorise this iteration
-        E_history.append(mean_error)
+        theta = [ theta_X0, theta_X1 ]
+        # calcul total cost (sum of errors) for gradient and mean error for prediction
+        total_cost = calcul_cost(loss_vector)
+        mean_error, max_error = calcul_error(loss_vector)
+        # memorise each iteration
+        E_history.append([mean_error, max_error])
         C_history.append(total_cost)
-        gradient_copy = gradient.copy()
-        G_history.append(gradient_copy)
-        theta_copy = theta.copy()
-        T_history.append(theta_copy)
+        G_history.append([ gradient_X0.copy(), gradient_X1.copy()])
+        T_history.append([ theta_X0.copy(), theta_X1.copy() ])
     return theta, E_history, C_history, G_history, T_history 
 
 def visualizeData(X, y, name_X, name_Y):  
     plt.figure(1)
     ax = plt.axes()
-    ax.set_xlim([0 ,max(X)*1.1])
-    ax.set_ylim([min(y)*0.9,max(y)*1.1])
+    ax.set_xlim([0 , max(X)*1.2])
+    ax.set_ylim([min(y)*0.8,max(y)*1.2])
     ax.scatter(X, y)
     plt.title('Dataset visualisation', fontsize=18, fontweight='bold')
     plt.xlabel(name_X, fontsize=14, fontweight='bold')
@@ -80,10 +89,10 @@ def visualizeData(X, y, name_X, name_Y):
 def visualizeRegression(X, y, theta, name_X, name_Y):
     plt.figure(2)
     ax = plt.axes()
-    ax.set_xlim([0 ,max(X)*1.1])
-    ax.set_ylim([min(y)*0.9,max(y)*1.1])
+    ax.set_xlim([min(X)*1.2,max(X)*1.2])
+    ax.set_ylim([min(y)*0.8,max(y)*1.2])
     ax.scatter(X, y)
-    line_x = np.linspace(0,max(X)*1.1, 20)
+    line_x = np.linspace(min(X)*1.2 , max(X)*1.2, 26)
     line_y = theta[0] + line_x * theta[1]
     ax.plot(line_x, line_y)
     plt.title('Function de regression', fontsize=18, fontweight='bold')
@@ -101,8 +110,8 @@ def visualizeHistory (history_list, history_name, figure_number) :
     ax.plot(history_list)
     plt.show()
 
-def save_parameters (theta, mean, stdev, mean_error) :
-    line = str(theta[0])+","+ str(theta[1]) + "," + str(mean)+","+ str(stdev)+","+ str(mean_error)
+def save_parameters (theta, mean, stdev, mean_error, max_error) :
+    line = str(theta[0])+","+ str(theta[1]) + "," + str(mean)+","+ str(stdev)+","+ str(mean_error)+","+ str(max_error)
     try :
         with open ("parameters.txt", "w" , encoding="utf-8") as file :
             file.write(line)
@@ -131,7 +140,7 @@ def main(filename):
     #initialise 2 linear coefficients theta[1] et theta[0] à zero
     theta = np.zeros(2)
     alpha = 0.2
-    iterations = 100
+    iterations = 50
     print("\n...Linear coefficients before learning" , theta)
     print("...Try to learn with learning rate =", alpha," iterations number =", iterations )
 
@@ -139,8 +148,10 @@ def main(filename):
     theta, E_history, C_history, G_history, T_history = learn(X_norm, y, theta, alpha, iterations)
     print("\nSUCCESS: Learning acomplished")
     print("RESULTS: Linear coefficients after learning" , theta)
-    mean_error = E_history[-1]
-    print("\nBonus 2 : Precision after learning: +-"+str(mean_error))
+    mean_error, max_error = E_history[-1]
+    print("\nBonus 2 : Precision after learning:")
+    print("            Mean error:  =  +-"+str(round(mean_error,0)))
+    print("            Max error:  =  +-"+str(round(max_error, 0)))
     
     # visualisations
     print("Bonus 3 : Visualize linear regression" )
@@ -151,13 +162,13 @@ def main(filename):
     visualizeHistory(G_history, "Gradient", 4)
     print("Bonus 7 : Visualize all iterations of total cost function" )
     visualizeHistory(C_history, "Total cost", 6)
-    print("Bonus 6 : Visualize all iterations of mean error" )
-    visualizeHistory(E_history, "Mean error", 5)
+    print("Bonus 6 : Visualize all iterations of mean and max error" )
+    visualizeHistory(E_history, "Precision", 5)
     print("\n----------------------------------------------------------------------")
 
     #saving results
     print("\nPhase IV : SAVING PARAMETERS ")
-    save_parameters (theta, mean, stdev, mean_error)
+    save_parameters (theta, mean, stdev, mean_error, max_error)
     print("\nSUCCESS: Parameters saved to file parameters.txt")
     print("USAGE: Use predict.py [option:parameters.txt] to predict price")
     print("\n----------------------------------------------------------------------\n")
