@@ -8,6 +8,11 @@ def predict (x, mean, stdev, theta):
     if y < 0 : y = 0
     return y
 
+def predict_moindres_carrees(x):
+    p = -0.02144 * x + 8499.599
+    e = 0.0028 * x + 313.164
+    return p, e
+
 def read_file (filename) :
     theta = [0,0]
     mean = 0
@@ -50,8 +55,9 @@ def main (filename) :
     print("\n-------------------------------------------------------------------")
     print("READ LEARNING PARAMETERS\n")
     theta, mean, stdev, mean_error, max_error = read_file(filename)
-    print ("\ncoef X0 =", theta[0], ", coef X1 =", theta[1])
-    print("mean error =", mean_error)
+    print("       Coef for X0 =", round(theta[0],2))
+    print("       Coef for X1 =", round(theta[1],2))
+    print("       Mean error =", round(mean_error,2))
     print("\n-------------------------------------------------------------------")
     print("PREDICTION")
     kilometrage = input ("\nQuel kilometrage ?\n").strip(" ")
@@ -61,18 +67,23 @@ def main (filename) :
             prediction = round(predict(km, mean, stdev, theta), 2)
             print ("\nPrediction prix :" , prediction, " euro")
             print("Precision du resultat :")
-            print ("         ecart moyen de prediction : +-"+str(round(mean_error,0))+" euro")
-            print ("         ecart maximal de prediction : +-"+str(round(max_error,0))+" euro")
+            print ("         erreur moyenne de prediction : +-"+str(round(mean_error,0))+" euro")
+            print ("         erreur maximale de prediction : +-"+str(round(max_error,0))+" euro")
+            #pred_mc, error_mc = predict_moindres_carrees(km)
+            #print ("\nComparison moindre carrees :" , pred_mc, " euro")
+            #print("Precision : +-", error_mc )
         except :
             print("\nERROR: Wrong format of input. Try again.")
-        
         kilometrage = input("\nAutre kilometrage ?\n").strip(" ")
 
 
 if __name__ == '__main__': 
     filename = "parameters.txt"
-    if len(sys.argv) == 2 :
+    if len(sys.argv) == 1 :
+        print("\nDefault file 'parameters.txt' will be used.")
+        main(filename)
+    elif len(sys.argv) == 2 :
         filename = sys.argv[1]
-    elif len(sys.argv) > 2 :
-        sys.exit("ERROR: Wrong number of parameters. expected one data file or nothing.")
-    main(filename)
+        main(filename)
+    else :
+        sys.exit("ERROR: Wrong number of parameters. Expected one data file or nothing")

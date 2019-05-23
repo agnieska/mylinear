@@ -57,8 +57,8 @@ def learn(X, y, theta, alpha, num_iters):
         empirical_results = y
         loss_vector = estimated_results - empirical_results
         #calcul gradient descent avec pas d'apprentissage alpha    
-        gradient_X0 =  - alpha / sample_size * sum(loss_vector * X0)
-        gradient_X1 =  - alpha / sample_size * sum(loss_vector * X1)
+        gradient_X0 =  - (alpha / sample_size) * sum(loss_vector * X0)
+        gradient_X1 =  - (alpha / sample_size) * sum(loss_vector * X1)
         #calcul new coefficients
         theta_X0 = theta[0] + gradient_X0 
         theta_X1 = theta[1] + gradient_X1
@@ -119,6 +119,20 @@ def save_parameters (theta, mean, stdev, mean_error, max_error) :
     except :
         sys.exit("WARNING: File could not be saved")
 
+def moindre_carres(X, y):
+    m = len(y)
+    meanX = sum(X)/ m
+    meanY = sum(y)/ m
+    up = sum ( (X - meanX) * (y - meanY) )
+    down = sum((X - meanX) ** 2)
+    a = up / down
+    b = meanY - a * meanX
+    up =  m   * (  sum(y * y) - a * sum(X * y)  -  b * sum(y)  )
+    down =  (m - 2) * (  m * sum(X * X)  - sum(X) **2 )       
+    Sa =  (up  / down) ** 0.5
+    Sb = ( 1/m * Sa**2 * sum(X*X)   )**0.5
+    return a, b, Sa, Sb
+
 def main(filename):
     print("----------------------------------------------------------------------\n")
     print("Phase I  READ DATA FOR LEARNING")
@@ -139,20 +153,29 @@ def main(filename):
     
     #initialise 2 linear coefficients theta[1] et theta[0] à zero
     theta = np.zeros(2)
-    alpha = 0.2
-    iterations = 50
+    alpha = 0.05
+    iterations = 100
     print("\n...Linear coefficients before learning" , theta)
     print("...Try to learn with learning rate =", alpha," iterations number =", iterations )
 
     #learning
     theta, E_history, C_history, G_history, T_history = learn(X_norm, y, theta, alpha, iterations)
     print("\nSUCCESS: Learning acomplished")
-    print("RESULTS: Linear coefficients after learning" , theta)
+    print("RESULTS: Linear coefficients after learning")
+    print("            Coef for X0 =", round(theta[0],2))
+    print("            Coef for X1 =", round(theta[1],2))
     mean_error, max_error = E_history[-1]
     print("\nBonus 2 : Precision after learning:")
-    print("            Mean error:  =  +-"+str(round(mean_error,0)))
-    print("            Max error:  =  +-"+str(round(max_error, 0)))
+    print("            Mean error:  =  +-"+str(round(mean_error,2)))
+    print("            Max error:  =  +-"+str(round(max_error, 2)))
     
+    #print("Comparison to moindre carrees")
+    #a, b , Sa, Sb = moindre_carres(X_raw, y)
+    #print("a=",a)
+    #print("b=",b)
+    #print("Erreur de a=",Sa)
+    #print("Erreur de b=",Sb)
+
     # visualisations
     print("Bonus 3 : Visualize linear regression" )
     visualizeRegression(X_norm, y, theta, name_X, name_Y)
@@ -176,7 +199,7 @@ def main(filename):
 if __name__ == '__main__':
     filename = "data.csv"
     if len(sys.argv) == 1 :
-        print("\nNo parameters. Default file 'data.csv' will be used.")
+        print("\nDefault file 'data.csv' will be used.")
         main(filename)
     elif len(sys.argv) == 2 :
         filename = sys.argv[1]
