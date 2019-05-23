@@ -8,25 +8,25 @@ def predict (x, mean, stdev, theta):
     if y < 0 : y = 0
     return y
 
-def read_file (theta_filename) :
+def read_file (filename) :
     theta = [0,0]
     mean = 0
     stdev = 0.00001
     mean_error = 0
     parameters = []
     try : 
-        with open (theta_filename, "r", encoding="utf-8") as file :
+        with open (filename, "r", encoding="utf-8") as file :
             #print("with open")
             line = file.readline()
             #print(line)
     except :
-        print ("training results not found. they will be initialized as zero")
+        print ("WARNING: The file",filename, "with training results not found. They will be initialized as zero")
         return theta, mean, stdev, mean_error
     try :
         parameters = line.split(",")
         print(str(parameters))
     except :
-        print ('''wrong format of parameters in first line. Expected line with sep=","''')
+        print ('''ERROR: Wrong format of parameters in the file. Expected line with 4 parameters separated by ","''')
         return theta, mean, stdev
     try :
         theta[0] = float(parameters[0].strip(" "))
@@ -35,15 +35,15 @@ def read_file (theta_filename) :
         stdev = float(parameters[3].strip(" "))
         mean_error =  float(parameters[4].strip(" "))
     except :
-        print ("wrong numbers of parameters in first line. Expected 4")
+        print ("ERROR: Wrong number of parameters in first line. Expected 4")
         return theta, mean, stdev , mean_error
     return theta, mean, stdev , mean_error
 
 
-def main (theta_filename) :
+def main (filename) :
     print("\n-------------------------------------------------------------------")
     print("READ LEARNING PARAMETERS\n")
-    theta, mean, stdev, mean_error = read_file(theta_filename)
+    theta, mean, stdev, mean_error = read_file(filename)
     print ("theta =", theta, "error =", mean_error)
 
     print("\n-------------------------------------------------------------------")
@@ -51,18 +51,20 @@ def main (theta_filename) :
     kilometrage = input ("\nQuel kilometrage ?\n").strip(" ")
     while kilometrage not in ["q", "quit", ""]:
         try :
-            prediction = round(predict (float(kilometrage), mean, stdev, theta), 2)
-            print ("Prediction prix :" , prediction, " euro")
-            print ("Erreur moyenne de prediction :" , round(mean_error,0), " euro")
+            km = float(kilometrage)
+            prediction = round(predict(km, mean, stdev, theta), 2)
+            print ("\nPrediction prix :" , prediction, " euro")
+            print ("Precision de prediction : +-"+str(round(mean_error,0))+" euro")
         except :
-            print("Wrong format of input. Try again")
-        kilometrage = input("Autre kilometrage ?\n").strip(" ")
+            print("\nERROR: Wrong format of input. Try again")
+        
+        kilometrage = input("\nAutre kilometrage ?\n").strip(" ")
 
 
 if __name__ == '__main__': 
-    theta_filename = "parameters.txt"
+    filename = "parameters.txt"
     if len(sys.argv) == 2 :
-        theta_filename = sys.argv[1]
+        filename = sys.argv[1]
     elif len(sys.argv) > 2 :
-        sys.exit("Wrong number of parameters. expected one data file or nothing")
-    main(theta_filename)
+        sys.exit("ERROR: Wrong number of parameters. expected one data file or nothing")
+    main(filename)
