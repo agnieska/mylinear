@@ -135,7 +135,7 @@ def moindre_carres(X, y):
 
 def main(filename):
     print("----------------------------------------------------------------------\n")
-    print("Phase I  READ DATA FOR LEARNING")
+    print("...try read the data")
     # lecture des donnees
     X_raw , y , name_X, name_Y = read_file(filename)
     print("\nSUCCESS: Found data 'X' to learn. \ncolumn name =", name_X , X_raw)
@@ -145,11 +145,11 @@ def main(filename):
     print("\nBonus 1 : Visualize  dataset before normalization")
     visualizeData(X_raw, y, name_X, name_Y)
     print("\n----------------------------------------------------------------------")
-    print("\nPhase II DATA NORMALIZATION")
+    print("\nPhase I DATA NORMALIZATION")
     X_norm, mean, stdev = centrer_reduire(X_raw)
     print("\nSUCCESS: X normalized = ", X_norm)
     print("\n----------------------------------------------------------------------")
-    print("\nPhase III LARNING")
+    print("\nPhase II LARNING")
     
     #initialise 2 linear coefficients theta[1] et theta[0] à zero
     theta = np.zeros(2)
@@ -190,7 +190,7 @@ def main(filename):
     print("\n----------------------------------------------------------------------")
 
     #saving results
-    print("\nPhase IV : SAVING PARAMETERS ")
+    print("\nPhase III : SAVING PARAMETERS ")
     save_parameters (theta, mean, stdev, mean_error, max_error)
     print("\nSUCCESS: Parameters saved to file parameters.txt")
     print("USAGE: Use predict.py [option:parameters.txt] to predict price")
@@ -199,10 +199,11 @@ def main(filename):
 if __name__ == '__main__':
     filename = "data.csv"
     if len(sys.argv) == 1 :
-        print("\nDefault file 'data.csv' will be used.")
+        print("\n...default file 'data.csv' will be used to learn.")
         main(filename)
     elif len(sys.argv) == 2 :
         filename = sys.argv[1]
+        print("\n...your specified file", filename, "will be used to learn.")
         main(filename)
     else :
         sys.exit("ERROR: Wrong number of parameters. Expected one data file or nothing")

@@ -53,25 +53,29 @@ def read_file (filename) :
 
 def main (filename) :
     print("\n-------------------------------------------------------------------")
-    print("READ LEARNING PARAMETERS\n")
+    print("...try to read parameters from", filename, "\n")
     theta, mean, stdev, mean_error, max_error = read_file(filename)
+    print("...reading completed\n")
     print("       Coef for X0 =", round(theta[0],2))
     print("       Coef for X1 =", round(theta[1],2))
     print("       Mean error =", round(mean_error,2))
     print("\n-------------------------------------------------------------------")
-    print("PREDICTION")
+    print("START PREDICTION")
     kilometrage = input ("\nQuel kilometrage ?\n").strip(" ")
     while kilometrage not in ["q", "quit", ""]:
         try :
             km = float(kilometrage)
-            prediction = round(predict(km, mean, stdev, theta), 2)
-            print ("\nPrediction prix :" , prediction, " euro")
-            print("Precision du resultat :")
-            print ("         erreur moyenne de prediction : +-"+str(round(mean_error,0))+" euro")
-            print ("         erreur maximale de prediction : +-"+str(round(max_error,0))+" euro")
-            #pred_mc, error_mc = predict_moindres_carrees(km)
-            #print ("\nComparison moindre carrees :" , pred_mc, " euro")
-            #print("Precision : +-", error_mc )
+            if km >= 0 :
+                prediction = round(predict(km, mean, stdev, theta), 2)
+                print ("\nPrediction prix :" , prediction, " euro")
+                print("Precision du resultat :")
+                print ("         erreur moyenne de prediction : +-"+str(round(mean_error,0))+" euro")
+                print ("         erreur maximale de prediction : +-"+str(round(max_error,0))+" euro")
+                #pred_mc, error_mc = predict_moindres_carrees(km)
+                #print ("\nComparison moindre carrees :" , pred_mc, " euro")
+                #print("Precision : +-", error_mc )
+            else :
+                print("\nERROR: Can't be negative. Try again.")
         except :
             print("\nERROR: Wrong format of input. Try again.")
         kilometrage = input("\nAutre kilometrage ?\n").strip(" ")
@@ -80,10 +84,11 @@ def main (filename) :
 if __name__ == '__main__': 
     filename = "parameters.txt"
     if len(sys.argv) == 1 :
-        print("\nDefault file 'parameters.txt' will be used.")
+        print("\n...default file 'parameters.txt' will be used to predict.")
         main(filename)
     elif len(sys.argv) == 2 :
         filename = sys.argv[1]
+        print("\n...your specified file", filename, "will be used to predict.")
         main(filename)
     else :
         sys.exit("ERROR: Wrong number of parameters. Expected one data file or nothing")
