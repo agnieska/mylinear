@@ -134,13 +134,13 @@ def moindre_carres(X, y):
     return a, b, Sa, Sb
 
 def main(filename):
-    print("----------------------------------------------------------------------\n")
     print("...try read the data")
     # lecture des donnees
     X_raw , y , name_X, name_Y = read_file(filename)
+    print("... reading completed")
+    print("----------------------------------------------------------------------\n")
     print("\nSUCCESS: Found data 'X' to learn. \ncolumn name =", name_X , X_raw)
     print("\nSUCCESS: Found data 'y' to predict. \ncolumn name =", name_Y, y)
-    
     # visualisation du dataset
     print("\nBonus 1 : Visualize  dataset before normalization")
     visualizeData(X_raw, y, name_X, name_Y)

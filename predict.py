@@ -26,8 +26,8 @@ def read_file (filename) :
             line = file.readline()
             #print(line)
     except :
-        print ("WARNING: The file '",filename, "' with training results not found.")
-        resp = input ("      Do you want to continue with parameters initialized as zero? Y/N \n")
+        print ("... The file '",filename, "' with training results not found.")
+        resp = input ("... Do you want to continue with parameters initialized as zero? Y/N \n")
         if resp in ["Y", "y", "Yes", "YES"] :
             return theta, mean, stdev , mean_error, max_error
         else :
@@ -48,14 +48,14 @@ def read_file (filename) :
     except :
         print ("ERROR: Wrong number of parameters in first line. Expected 4.")
         return theta, mean, stdev , mean_error, max_error
+    print("...reading completed\n")
     return theta, mean, stdev , mean_error, max_error
 
 
 def main (filename) :
-    print("\n-------------------------------------------------------------------")
-    print("...try to read parameters from", filename, "\n")
+    print("...try to read parameters from", filename)
     theta, mean, stdev, mean_error, max_error = read_file(filename)
-    print("...reading completed\n")
+    print("-------------------------------------------------------------------\n")
     print("       Coef for X0 =", round(theta[0],2))
     print("       Coef for X1 =", round(theta[1],2))
     print("       Mean error =", round(mean_error,2))
